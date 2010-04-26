@@ -5,15 +5,15 @@ import java.util.Comparator;
 public class CountTriangles {
 	public static int count(Point[] points, Point query) {
 		/* Arrays are twice the length so we can simulate wrap-around */
-		Point[] offset = new Point[2*points.length];
-		int[] N = new int[2*points.length];
-		int[] T = new int[points.length];
+		Point[] offset = new Point[2*points.length+2];
+		int[] N = new int[2*points.length+2];
+		int[] T = new int[points.length+1];
 		
-		for (int i = 0; i < points.length; i++) {
-			offset[i] = new Point(points[i].getX() - query.getX(), points[i].getY() - query.getY());
+		for (int i = 1; i < points.length+1; i++) {
+			offset[i] = new Point(points[i-1].getX() - query.getX(), points[i-1].getY() - query.getY());
 		}
 		
-		Arrays.sort(offset, 0, points.length, new Comparator<Point>() {
+		Arrays.sort(offset, 1, points.length+1, new Comparator<Point>() {
 			@Override
 			public int compare(Point o1, Point o2) {
 				double angle1 = o1.getPolarAngle();
@@ -25,75 +25,91 @@ public class CountTriangles {
 			}
 		});
 		
-		for (int i = 0; i < points.length; i++)
-			System.out.println(offset[i].getPolarAngle() + " " + offset[i].getAntipoleAngle());
+//		for (int i = 1; i < points.length+1; i++)
+//			System.out.println(offset[i].getPolarAngle() + " " + offset[i].getAntipoleAngle());
 		
-		int start = 0;
-		for (int n = 0; n < points.length-1; n++) {
-			for (int i = start; i < points.length; i++) {
-				if (Ccw.inAngleRange(offset[i].getPolarAngle(), offset[n].getAntipoleAngle(), offset[n+1].getAntipoleAngle())) {
+		int start = 1;
+		for (int n = 1; n < points.length+1; n++) {
+			for (int i = start; i < points.length+1; i++) {
+				int nplus1 = n+1;
+				if (nplus1 >= points.length+1) nplus1 = 1;
+				if (Ccw.inAngleRange(offset[i].getPolarAngle(), offset[n].getAntipoleAngle(), offset[nplus1].getAntipoleAngle())) {
 					start = i;
 					break;
 				}
 			}
 			
-			for (int i = start, count = 0; count < points.length; i = (i+1)%points.length, count++) {
-				if (!Ccw.inAngleRange(offset[i].getPolarAngle(), offset[n].getAntipoleAngle(), offset[n+1].getAntipoleAngle())) {
+			for (int i = start, count = 0; count < points.length; count++) {
+				int nplus1 = n+1;
+				if (nplus1 >= points.length+1) nplus1 = 1;
+				if (!Ccw.inAngleRange(offset[i].getPolarAngle(), offset[n].getAntipoleAngle(), offset[nplus1].getAntipoleAngle())) {
 					N[n] = count;
 					start = i;
 					break;
 				}
+				i++;
+				if (i >= points.length+1) i = 1;
 			}
 		}
 		
-		/* Duplicate the second part of the array */
-//		for (int i = 0; i < points.length; i++) {
-//			offset[i+points.length] = offset[i];
-//			N[i+points.length] = N[i];
-//		}
+		for (int i = 1; i < points.length+1; i++) System.out.println("i = " + i + ", N[i] = " + N[i]);
 		
-		for (int i = 0; i < 2*points.length; i++)
-			if (!Ccw.inAngleRange(offset[i].getPolarAngle(), offset[0].getPolarAngle(),
-					offset[0].getAntipoleAngle())) {
+		/* Duplicate the second part of the array */
+		for (int i = points.length+1; i < 2*points.length+1; i++) {
+			offset[i] = offset[i-points.length];
+			N[i] = N[i-points.length];
+		}
+		
+		for (int i = 1; i < 2*points.length+1; i++)
+			if (!Ccw.inAngleRange(offset[i].getPolarAngle(), offset[1].getPolarAngle(),
+					offset[1].getAntipoleAngle())) {
 				start = i-1;
 				break;
 			}
 
-		for (int i = 0; i < start; i++) {
-			T[0] += (start-i) * N[i];
+		for (int i = 1; i <= start-1; i++) {
+			T[1] += (start-i) * N[i];
 		}
 		
 		System.out.println("start = " + start);
 		
-		for (int n = 1; n < points.length; n++) {
+		for (int n = 2; n < points.length+1; n++) {
 			T[n] = T[n-1];
 			
 			int m = 0;
-			for (int i = start+1; i < points.length; i=(i+1)%points.length) {
+			for (int i = start+1; ; ) {
 				if (!Ccw.inAngleRange(offset[i].getPolarAngle(), offset[n].getPolarAngle(), offset[n].getAntipoleAngle())) {
 					break;
 				}
 				m++;
+				
+				i++;
+				if (i == points.length+1) i = 1; 
 			}
-			System.out.println("m = " + m);
+//			System.out.println("m = " + m);
 			
-			if (m != 0) {
-				for (int i = n; i <= start; i++)
-					T[n] += m * N[i];
+			for (int i = n; i <= start-1; i++) {
+				T[n] += m * N[i];
+				System.out.print(i);
 			}
+			System.out.println();
 			
-			for (int i = start+1; i < start+m; i++)
+			for (int i = start; i <= start+m-1; i++) {
 				T[n] += (start+m-i) * N[i];
+				System.out.print(i);
+			}
+			System.out.println();
 			
-			T[n] -= (start - n) * N[n-1];
+			T[n] -= (start - n + 1) * N[n-1];
 			
 			start += m;
 			
-			start %= points.length;
+			System.out.println("start = " + start);
+			
 		}
 		
 		int totalcount = 0;
-		for (int i = 0; i < points.length; i++)
+		for (int i = 1; i < points.length+1; i++)
 			totalcount += T[i];
 		
 		for (int i : T) System.out.println("T = " + i);

@@ -45,11 +45,22 @@ public class IntersectionFinding {
 //		System.out.println(p1.isIntersecting(p4) == false);
 //		System.out.println(p4.isIntersecting(p1) == false);
 		
+		/* Basic test: CountTriangles should return 2 */
 		Point[] points = new Point[4];
 		points[0] = new Point(3,3);
 		points[1] = new Point(-2, 2);
 		points[2] = new Point(-1, -5);
 		points[3] = new Point(10, -1);
+		
+		System.out.println(CountTriangles.count(points, new Point(0,0)));
+		
+		/* Pentagon test: Star shape centered at the origin */
+		points = new Point[5];
+		points[0] = new Point(1, 4);
+		points[1] = new Point(5, 0);
+		points[2] = new Point(3, -4);
+		points[3] = new Point(-1, -4);
+		points[4] = new Point(-3, 0);
 		
 		System.out.println(CountTriangles.count(points, new Point(0,0)));
 	}
