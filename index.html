@@ -6,22 +6,22 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 	<title>hchin/15456-Project-1 @ GitHub</title>
-	
-	<style type="text/css">
+<link rel="stylesheet" href="simdepth_style.css" type="text/css" />
+<style type="text/css">
 		body {
-  		margin-top: 1.0em;
-  		background-color: #5757a3;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #ffffff;
+	margin-top: 1.0em;
+	background-color: #FFFFFF;
+	font-family: "Helvetica,Arial,FreeSans";
+	color: #ffffff;
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-		h1 { font-size: 3.8em; color: #a8a85c; margin-bottom: 3px; }
+		h1 { font-size: 3.8em; color: #000000; margin-bottom: 3px; }
 		h1 .small { font-size: 0.4em; }
 		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #a8a85c; }
+		h2 { font-size: 1.5em; color: #000000; }
     h3 { text-align: center; color: #a8a85c; }
     a { color: #a8a85c; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
@@ -29,7 +29,8 @@
 		pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
+.style4 {color: #000000}
+    </style>
 	
 </head>
 
@@ -37,44 +38,59 @@
   <a href="http://github.com/hchin/15456-Project-1"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
   <div id="container">
+    <h1 class="style4"><a href="http://github.com/hchin/15456-Project-1" class="pageHeader">Visualizing Simplicial Depth</a></h1>
 
-    <div class="download">
-      <a href="http://github.com/hchin/15456-Project-1/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/hchin/15456-Project-1/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+    <div class="box"><span class="boxText">by<a href="mailto:hchin@andrew.cmu.edu"> Hui Han Chin</a>, <a href="mailto:junjieli@andrew.cmu.edu">Junjie Liang</a></span><br/>      
     </div>
-
-    <h1><a href="http://github.com/hchin/15456-Project-1">15456-Project-1</a>
-      <span class="small">by <a href="http://github.com/hchin">hchin</a></span></h1>
-
-    <div class="description">
-      15456:cmu computational geometry project
+<div class="boxText"><a href="#Overview">Overview</a> / <a href="#Algorithm">Algorithm</a> /<a href="#Download"> Download</a> </div>
+    
+    <div align="left">
+      <table width="695" border="0">
+        <tr>
+          <td width="420"><applet archive="SimplicialDepth.jar" code="SimplicialDepth.class" width="420" height="500">
+          </applet></td>
+          <td width="265" valign="top" class="boxText"><p><strong>Instructions</strong></p>
+            <ol>
+              <li>Click on grid to add points. </li>
+              <li>Click on a point to remove it.</li>
+              <li>Click on &quot;VISUALIZE&quot; to the simplicial depth of each region. The depth is represented by height in the z-axis</li>
+              <li>Click on &quot;RESET&quot; to input a new set of points.</li>
+            </ol>
+          <p><strong>Options</strong></p>
+          <ul>
+            <li>GRID - toggles the grid</li>
+            <li>DETAIL - toggles mouse tip</li>
+            <li></li>
+          </ul></td>
+        </tr>
+      </table>
     </div>
-
-    <h2>Authors</h2>
-<p>hchin (hchin@andrew.cmu.edu)<br/>Junjie Liang (junjieliang@gmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p> (hchin@andrew.cmu.edu)<br/>      </p>
-<APPLET ARCHIVE="SimplicialDepth.jar" CODE="SimplicialDepth.class" WIDTH=400 HEIGHT=600>
-</APPLET>
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/hchin/15456-Project-1/zipball/master">zip</a> or
-      <a href="http://github.com/hchin/15456-Project-1/tarball/master">tar</a> formats.
+    <h2 class="bodyText" id="Overview">Overview</h2>
+    <span class="boxText">Given a set of points P,a nd a query point Q, the simplicial depth of Q with respect to P is the number of simplices formed by P that contains Q. In the 2-D case, the simplex would be a triangle and the simplicial depth of a point would be the number of triangles that contained that point. Simplicial depth give raise to a notation of "deepness"  of a point in a point set.</span>
+    <h2 class="bodyText" id="Algorithm">Algorithm</h2>
+    <p class="boxText"> The Algorithm is broken down into steps  
+    <ol class="boxText">
+      <li>Given a point set P of size n, compute all possible lines segments that can be formed. This can be done in O(n^2) </li>
+      <li>Compute the convex hull of P. Any point that lies outside the convex hull has depth 0. This can be done using Graham Scan in O(n log n) </li>
+      <li>Compute every intersection of any pair of lines and we pertube the point of interesection slightly to get a new set of point that lies in some small distance from the original distance. These points would be used to represent the regions that has the intersection point as a vertex and the lines as edges. This can be done in O(n log n)</li>
+      <li> For each of the "pertubed" points we compute the "color" of the point,a number which represents the number of lines where the point is infront of. We can check this using CCW</li>
+      <li> Next we compute the simplicial depth of the points and any point that is in a face that has such a pertubed point will have the same simplicial depth as that point</li>
+      <li>For every point in the convex hull we "color" the point and obtain its simplicial depth by looking the pertubed points which shares the same color</li>
+      <li>The depth of each point is then visualized as the height in the Z-axis. The deeper a point, the higher it is in the Z-axis </li>
+    </ol>
     </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/hchin/15456-Project-1</pre>
+    <div><h2 class="bodyText" id="Download">Download</h2>
+    <a href="http://github.com/hchin/15456-Project-1/zipball/master"><img border="0" width="90" src="http://github.com/images/modules/download/zip.png" /></a></span>
+    <a href="http://github.com/hchin/15456-Project-1/tarball/master"><img border="0" width="90" src="http://github.com/images/modules/download/tar.png" /></a></span>
+   </div>
+
+    <pre>$ git clone git://github.com/hchin/15456-Project-1<span class="bodyText"><span class="download"><a href="http://github.com/hchin/15456-Project-1/zipball/master"></a></span></span></pre>
+    <span class="boxText">
     </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/hchin/15456-Project-1">hchin/15456-Project-1</a>
-    </div>
-
-  </div>
+    </span>
+    <div class="boxText">
+    get the source code on GitHub : <a href="http://github.com/hchin/15456-Project-1">hchin/15456-Project-1</a> </div>
+</div>
 
   
 </body>
